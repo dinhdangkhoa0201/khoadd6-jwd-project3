@@ -1,4 +1,10 @@
-# Purpose of this Folder
+# Java Web Developer - Project 3 - Critter
 
-This folder should contain the scaffolded project files to get a student started on their project. This repo will be added to the Classroom for students to use, so please do not have any solutions in this folder.
-# khoadd6-jwd-project3
+## Set Up
+
+- Clone or download this repository
+- Open IntelliJ IDEA.
+    - In IDEA, select `File` -> `Project Structure...` -> `Module` -> `Add` -> `Import Module` -> Choice `critter` -> `Import module from external model` -> `Maven` -> `Finish`
+- Open MySQL Workbench, run this [script](critter/src/main/resources/schema.sql)
+
+
