@@ -11,6 +11,6 @@ import org.springframework.stereotype.Repository;
 public interface PetRepository extends JpaRepository<PetEntity, Long> {
     List<PetEntity> findByIdIn(List<Long> ids);
 
-    @Query("SELECT p FROM PetEntity p WHERE p.owner.id = :ownerId")
+    @Query("SELECT p FROM PetEntity p WHERE p.customer.id = :ownerId")
     List<PetEntity> findByOwner(@Param("ownerId") Long ownerId);
 }

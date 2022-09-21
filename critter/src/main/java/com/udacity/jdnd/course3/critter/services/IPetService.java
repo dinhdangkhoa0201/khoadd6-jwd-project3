@@ -6,13 +6,13 @@ import java.util.List;
 
 public interface IPetService {
 
-    PetDTO add(PetDTO pet);
+    PetEntity add(PetDTO pet);
 
-    PetDTO findByID(Long petId);
+    PetEntity findByID(Long petId);
 
-    List<PetDTO> findAll();
+    List<PetEntity> findAll();
 
-    List<PetDTO> findByIds(List<Long> ids);
+    List<PetEntity> findByIds(List<Long> ids);
 
-    List<PetDTO> findByOwnerId(Long ownerId);
+    List<PetEntity> findByOwnerId(Long ownerId);
 }

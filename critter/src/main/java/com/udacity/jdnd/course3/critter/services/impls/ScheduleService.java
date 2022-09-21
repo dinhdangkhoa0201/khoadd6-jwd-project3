@@ -11,14 +11,14 @@ import com.udacity.jdnd.course3.critter.repositories.ScheduleRepository;
 import com.udacity.jdnd.course3.critter.services.IScheduleService;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Transactional
 public class ScheduleService implements IScheduleService {
 
     @Autowired
@@ -37,65 +37,43 @@ public class ScheduleService implements IScheduleService {
     private EntityManager entityManager;
 
     @Override
-    public ScheduleDTO add(ScheduleDTO schedule) {
-        ScheduleEntity entity = new ScheduleEntity(schedule);
-        entity.setEmployees(employeeRepository.findByIdIn(schedule.getEmployeeIds()));
-        entity.setPets(petRepository.findByIdIn(schedule.getPetIds()));
+    public ScheduleEntity add(ScheduleDTO schedule) {
+        ScheduleEntity entity = new ScheduleEntity();
+        List<PetEntity> listPet = petRepository.findAllById(schedule.getPetIds());
+        List<EmployeeEntity> listEmployee = employeeRepository.findAllById(schedule.getEmployeeIds());
+        entity.setDate(schedule.getDelivery());
+        entity.setEmployees(listEmployee);
+        entity.setPets(listPet);
+        entity.setActivities(schedule.getActivities());
         entity = scheduleRepository.save(entity);
-        ScheduleDTO dto = new ScheduleDTO(entity);
-        return dto;
+        return entity;
     }
 
     @Override
-    public List<ScheduleDTO> findAll() {
-        List<ScheduleEntity> listEntity = scheduleRepository.findAll();
-        List<ScheduleDTO> listDTO = new ArrayList<>();
-        if (!listEntity.isEmpty()) {
-            listEntity.forEach(e -> {
-                e.setEmployees(employeeRepository.findByIdIn(e.getEmployees().stream().map(
-                        EmployeeEntity::getId).collect(Collectors.toList())));
-                listDTO.add(new ScheduleDTO(e));
-            });
-        }
-        return listDTO;
+    public List<ScheduleEntity> findAll() {
+        return scheduleRepository.findAll();
     }
 
     @Override
-    public List<ScheduleDTO> findByPet(Long petId) {
-        List<ScheduleEntity> listEntity = scheduleRepository.findByPetsContaining(
+    public List<ScheduleEntity> findByPet(Long petId) {
+        return scheduleRepository.findByPetsContaining(
                 petRepository.getOne(petId));
-        List<ScheduleDTO> listDTO = new ArrayList<>();
-        if (listEntity != null && !listEntity.isEmpty()) {
-            listEntity.forEach(e -> {
-                listDTO.add(new ScheduleDTO(e));
-            });
-        }
-        return listDTO;
     }
 
     @Override
-    public List<ScheduleDTO> findByCustomer(Long customerId) {
-        List<ScheduleDTO> listDTO = new ArrayList<>();
+    public List<ScheduleEntity> findByCustomer(Long customerId) {
         List<PetEntity> listPet = petRepository.findByOwner(customerId);
         List<ScheduleEntity> listEntity = new ArrayList<>();
         for (PetEntity pet : listPet) {
             listEntity.addAll(scheduleRepository.findByPetsContaining(pet));
         }
-        if (!listEntity.isEmpty()) {
-            listDTO.addAll(listEntity.stream().map(e -> new ScheduleDTO(e)).collect(Collectors.toList()));
-        }
-        return listDTO;
+        return listEntity;
     }
 
     @Override
-    public List<ScheduleDTO> findByEmployee(Long employeeId) {
-        List<ScheduleEntity> listEntity = scheduleRepository.findByEmployeesContaining(employeeRepository.getOne(employeeId));
-        List<ScheduleDTO> listDTO = new ArrayList<>();
-        if (listEntity != null && !listEntity.isEmpty()) {
-            listEntity.forEach(e -> {
-                listDTO.add(new ScheduleDTO(e));
-            });
-        }
-        return listDTO;
+    public List<ScheduleEntity> findByEmployee(Long employeeId) {
+        List<ScheduleEntity> listEntity = scheduleRepository.findByEmployeesContaining(
+                employeeRepository.getOne(employeeId));
+        return listEntity;
     }
 }

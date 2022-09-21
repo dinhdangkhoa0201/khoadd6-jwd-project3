@@ -8,11 +8,14 @@ import com.udacity.jdnd.course3.critter.repositories.PetRepository;
 import com.udacity.jdnd.course3.critter.services.ICustomerService;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 @Service
+@Transactional
 public class CustomerService implements ICustomerService {
 
     @Autowired
@@ -22,32 +25,32 @@ public class CustomerService implements ICustomerService {
     private PetRepository petRepository;
 
     @Override
-    public List<CustomerDTO> findAll() {
-        List<CustomerDTO> listDTO = new ArrayList<>();
-        List<CustomerEntity> listEntity = customerRepository.findAll();
-        if (!listEntity.isEmpty()) {
-            listEntity.forEach(e -> {
-                e.setPets(petRepository.findByOwner(e.getId()));
-                listDTO.add(new CustomerDTO(e));
+    public List<CustomerEntity> findAll() {
+        return customerRepository.findAll();
+    }
+
+    @Override
+    public CustomerEntity add(CustomerDTO customer) {
+        CustomerEntity entity = new CustomerEntity();
+        entity.setName(customer.getName());
+        entity.setPhoneNumber(customer.getPhoneNumber());
+        entity.setNotes(customer.getNotes());
+        List<PetEntity> listPet = new ArrayList<>();
+        List<Long> listPetId = customer.getPetIds();
+        if (!CollectionUtils.isEmpty(listPetId)) {
+            listPetId.forEach(e -> {
+                Optional<PetEntity> petEntity = petRepository.findById(e);
+                petEntity.ifPresent(listPet::add);
             });
         }
-        return listDTO;
+        entity.setPets(listPet);
+        return customerRepository.save(entity);
     }
 
     @Override
-    public CustomerDTO add(CustomerDTO customer) {
-        CustomerEntity entity = new CustomerEntity(customer);
-        entity = customerRepository.save(entity);
-        return new CustomerDTO(entity);
-    }
-
-    @Override
-    public CustomerDTO findByPetId(Long petId) {
-        CustomerDTO dto = new CustomerDTO(customerRepository.findByPet(petId));
-        List<PetEntity> listEntity = petRepository.findByOwner(dto.getId());
-        if (!listEntity.isEmpty()) {
-            dto.setPetIds(listEntity.stream().map(PetEntity::getId).collect(Collectors.toList()));
-        }
-        return dto;
+    public CustomerEntity findByPetId(Long petId) {
+        CustomerEntity entity = petRepository.getOne(petId).getCustomer();
+        entity.getPets();
+        return entity;
     }
 }

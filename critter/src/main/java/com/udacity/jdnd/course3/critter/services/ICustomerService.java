@@ -6,10 +6,10 @@ import java.util.List;
 
 public interface ICustomerService {
 
-    List<CustomerDTO> findAll();
+    List<CustomerEntity> findAll();
 
-    CustomerDTO add(CustomerDTO customer);
+    CustomerEntity add(CustomerDTO customer);
 
-    CustomerDTO findByPetId(Long petId);
+    CustomerEntity findByPetId(Long petId);
 
 }

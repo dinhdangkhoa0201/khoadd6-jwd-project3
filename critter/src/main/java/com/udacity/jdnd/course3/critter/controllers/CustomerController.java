@@ -1,8 +1,10 @@
 package com.udacity.jdnd.course3.critter.controllers;
 
 import com.udacity.jdnd.course3.critter.dtos.CustomerDTO;
+import com.udacity.jdnd.course3.critter.entities.CustomerEntity;
 import com.udacity.jdnd.course3.critter.services.ICustomerService;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,16 +22,16 @@ public class CustomerController {
 
     @PostMapping("")
     public CustomerDTO save(@RequestBody CustomerDTO dto) {
-        return iCustomerService.add(dto);
+        return iCustomerService.add(dto).builder();
     }
 
     @GetMapping
     public List<CustomerDTO> findAll() {
-        return iCustomerService.findAll();
+        return iCustomerService.findAll().stream().map(CustomerEntity::builder).collect(Collectors.toList());
     }
 
     @GetMapping(path = "/pets/{petId}")
     public CustomerDTO findOwnerByPet(@PathVariable("petId") Long petId) {
-        return iCustomerService.findByPetId(petId);
+        return iCustomerService.findByPetId(petId).builder();
     }
 }

@@ -7,18 +7,16 @@ import com.udacity.jdnd.course3.critter.repositories.EmployeeRepository;
 import com.udacity.jdnd.course3.critter.services.IEmployeeService;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Transactional
 public class EmployeeService implements IEmployeeService {
 
     @PersistenceContext
@@ -28,54 +26,35 @@ public class EmployeeService implements IEmployeeService {
     private EmployeeRepository employeeRepository;
 
     @Override
-    public EmployeeDTO add(EmployeeDTO dto) {
-        EmployeeEntity entity = new EmployeeEntity(dto);
-        entity = employeeRepository.save(entity);
-        return new EmployeeDTO(entity);
+    public EmployeeEntity add(EmployeeDTO dto) {
+        EmployeeEntity entity = new EmployeeEntity();
+        entity.setId(dto.getId());
+        entity.setName(dto.getName());
+        entity.setSkills(dto.getSkills());
+        entity.setDaysAvailable(dto.getDaysAvailable());
+        return employeeRepository.save(entity);
     }
 
     @Override
-    public EmployeeDTO findById(Long employeeId) {
-        Optional<EmployeeEntity> optional = employeeRepository.findById(employeeId);
-        EmployeeDTO dto = null;
-        if (optional.isPresent()) {
-            dto = new EmployeeDTO(optional.get());
-        }
-        return dto;
+    public EmployeeEntity findById(Long employeeId) {
+        return employeeRepository.getOne(employeeId);
     }
 
     @Override
-    public List<EmployeeDTO> findByIds(List<Long> ids) {
-        List<EmployeeEntity> listEntity = employeeRepository.findByIdIn(ids);
-        List<EmployeeDTO> listDTO = new ArrayList<>();
-        if (listEntity.isEmpty()) {
-            listEntity.forEach(e -> {
-                listDTO.add(new EmployeeDTO(e));
-            });
-        }
-        return listDTO;
+    public List<EmployeeEntity> findByIds(List<Long> ids) {
+        return employeeRepository.findByIdIn(ids);
     }
 
     @Override
-    public List<EmployeeDTO> findByAvailability(Set<EmployeeSkill> skills, LocalDate date) {
-        List<EmployeeEntity> listEntity = employeeRepository.findByDaysAvailableContaining(date.getDayOfWeek());
-        List<EmployeeDTO> listDTO = new ArrayList<>();
-        if (listEntity != null && !listEntity.isEmpty()) {
-            listEntity.forEach(e -> {
-                if (e.getSkills().containsAll(skills)) {
-                    listDTO.add(new EmployeeDTO(e));
-                }
-            });
-        }
-        return listDTO;
-    }
-
-    private List<String> listOfString(Set<EmployeeSkill> skills) {
-        if (skills == null || skills.isEmpty()) {
-            return Collections.singletonList("");
-        }
-        return skills.stream()
-                .map(EmployeeSkill::name)
-                .collect(Collectors.toList());
+    public List<EmployeeEntity> findByAvailability(Set<EmployeeSkill> skills, LocalDate date) {
+        List<EmployeeEntity> listEntity = employeeRepository.findByDaysAvailableContaining(
+                date.getDayOfWeek());
+        List<EmployeeEntity> listAvailable = new ArrayList<>();
+        listEntity.forEach(e -> {
+            if (e.getSkills().containsAll(skills)) {
+                listAvailable.add(e);
+            }
+        });
+        return listAvailable;
     }
 }

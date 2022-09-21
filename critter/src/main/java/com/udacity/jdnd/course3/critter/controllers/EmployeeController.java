@@ -2,10 +2,12 @@ package com.udacity.jdnd.course3.critter.controllers;
 
 import com.udacity.jdnd.course3.critter.dtos.EmployeeDTO;
 import com.udacity.jdnd.course3.critter.dtos.EmployeeRequestDTO;
+import com.udacity.jdnd.course3.critter.entities.EmployeeEntity;
 import com.udacity.jdnd.course3.critter.services.IEmployeeService;
 import java.time.DayOfWeek;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,24 +26,25 @@ public class EmployeeController {
 
     @PostMapping
     public EmployeeDTO save(@RequestBody EmployeeDTO dto) {
-        return iEmployeeService.add(dto);
+        return iEmployeeService.add(dto).builder();
     }
 
     @PostMapping("/{employeeId}")
     public EmployeeDTO findById(@PathVariable("employeeId") Long employeeId) {
-        return iEmployeeService.findById(employeeId);
+        return iEmployeeService.findById(employeeId).builder();
     }
 
     @PutMapping("/{employeeId}")
     public void setAvailability(@RequestBody Set<DayOfWeek> daysAvailable,
             @PathVariable("employeeId") Long employeeId) {
-        EmployeeDTO employeeDTO = iEmployeeService.findById(employeeId);
+        EmployeeDTO employeeDTO = iEmployeeService.findById(employeeId).builder();
         employeeDTO.setDaysAvailable(daysAvailable);
         iEmployeeService.add(employeeDTO);
     }
 
     @GetMapping("/availability")
     public List<EmployeeDTO> findEmployeesForSkill(@RequestBody EmployeeRequestDTO request) {
-        return iEmployeeService.findByAvailability(request.getSkills(), request.getDate());
+        return iEmployeeService.findByAvailability(request.getSkills(), request.getDate()).stream().map(
+                EmployeeEntity::builder).collect(Collectors.toList());
     }
 }

@@ -15,80 +15,38 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "employees")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class EmployeeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "employee_id")
     private Long id;
 
     @Column(name = "name", nullable = false)
     private String name;
 
     @ElementCollection(targetClass = EmployeeSkill.class)
-    @Enumerated(EnumType.STRING)
-    @CollectionTable(
-            name = "employees_skills",
-            joinColumns = @JoinColumn(name = "employee_id")
-    )
-    @Column(name = "skill_name")
     private Set<EmployeeSkill> skills;
 
     @ElementCollection(targetClass = DayOfWeek.class)
-    @Enumerated
-    @CollectionTable(
-            name = "employees_availability",
-            joinColumns = @JoinColumn(name = "employee_id")
-    )
-    @Column(name = "weekday")
     private Set<DayOfWeek> daysAvailable;
 
-    public EmployeeEntity(EmployeeDTO dto) {
-        this.id = dto.getId();
-        this.name = dto.getName();
-        this.skills = dto.getSkills();
-        this.daysAvailable = dto.getDaysAvailable();
-    }
-
-    public EmployeeEntity(Long id) {
-        this.id = id;
-    }
-
-    public EmployeeEntity() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Set<EmployeeSkill> getSkills() {
-        return skills;
-    }
-
-    public void setSkills(Set<EmployeeSkill> skills) {
-        this.skills = skills;
-    }
-
-    public Set<DayOfWeek> getDaysAvailable() {
-        return daysAvailable;
-    }
-
-    public void setDaysAvailable(Set<DayOfWeek> daysAvailable) {
-        this.daysAvailable = daysAvailable;
+    public EmployeeDTO builder() {
+        return EmployeeDTO.builder()
+                .id(this.id)
+                .name(this.getName())
+                .skills(this.skills)
+                .daysAvailable(this.daysAvailable)
+                .build();
     }
 }

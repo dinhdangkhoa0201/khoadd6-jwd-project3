@@ -9,11 +9,11 @@ import java.util.Set;
 
 public interface IEmployeeService {
 
-    EmployeeDTO add(EmployeeDTO employee);
+    EmployeeEntity add(EmployeeDTO employee);
 
-    EmployeeDTO findById(Long employeeId);
+    EmployeeEntity findById(Long employeeId);
 
-    List<EmployeeDTO> findByIds(List<Long> ids);
+    List<EmployeeEntity> findByIds(List<Long> ids);
 
-    List<EmployeeDTO> findByAvailability(Set<EmployeeSkill> skills, LocalDate date);
+    List<EmployeeEntity> findByAvailability(Set<EmployeeSkill> skills, LocalDate date);
 }

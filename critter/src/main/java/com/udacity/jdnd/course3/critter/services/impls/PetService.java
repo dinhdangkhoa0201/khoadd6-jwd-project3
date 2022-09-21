@@ -1,73 +1,59 @@
 package com.udacity.jdnd.course3.critter.services.impls;
 
 import com.udacity.jdnd.course3.critter.dtos.PetDTO;
+import com.udacity.jdnd.course3.critter.entities.CustomerEntity;
 import com.udacity.jdnd.course3.critter.entities.PetEntity;
+import com.udacity.jdnd.course3.critter.repositories.CustomerRepository;
 import com.udacity.jdnd.course3.critter.repositories.PetRepository;
 import com.udacity.jdnd.course3.critter.services.IPetService;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Transactional
 public class PetService implements IPetService {
 
     @Autowired
     private PetRepository petRepository;
 
+    @Autowired
+    private CustomerRepository customerRepository;
+
     @Override
-    public PetDTO add(PetDTO pet) {
-        PetEntity entity = new PetEntity(pet);
+    public PetEntity add(PetDTO pet) {
+        PetEntity entity = new PetEntity();
+        CustomerEntity customer = customerRepository.getOne(pet.getOwnerId());
+        entity.setName(pet.getName());
+        entity.setBirthDate(pet.getBirthDate());
+        entity.setType(pet.getType());
+        entity.setNotes(pet.getNotes());
+        entity.setCustomer(customer);
         entity = petRepository.save(entity);
-        PetDTO dto = new PetDTO(entity);
-        return dto;
+        customer.getPets().add(entity);
+        customerRepository.save(customer);
+        return entity;
     }
 
     @Override
-    public PetDTO findByID(Long petId) {
-        Optional<PetEntity> optional = petRepository.findById(petId);
-        PetDTO dto = null;
-        if (optional.isPresent()) {
-            dto = new PetDTO(optional.get());
-        }
-        return dto;
+    public PetEntity findByID(Long petId) {
+        return petRepository.getOne(petId);
     }
 
     @Override
-    public List<PetDTO> findAll() {
-        List<PetEntity> listEntity = petRepository.findAll();
-        List<PetDTO> listDTO = new ArrayList<>();
-        if (!listEntity.isEmpty()) {
-            listEntity.forEach(e -> {
-                listDTO.add(new PetDTO(e));
-            });
-        }
-        return listDTO;
+    public List<PetEntity> findAll() {
+        return petRepository.findAll();
     }
 
     @Override
-    public List<PetDTO> findByIds(List<Long> ids) {
-        List<PetEntity> listEntity = petRepository.findByIdIn(ids);
-        List<PetDTO> listDTO = new ArrayList<>();
-        if (!listEntity.isEmpty()) {
-            listEntity.forEach(e -> {
-                listDTO.add(new PetDTO(e));
-            });
-        }
-        return listDTO;
+    public List<PetEntity> findByIds(List<Long> ids) {
+        return petRepository.findByIdIn(ids);
     }
 
     @Override
-    public List<PetDTO> findByOwnerId(Long ownerId) {
-        List<PetEntity> listEntity = petRepository.findByOwner(ownerId);
-        List<PetDTO> listDTO = new ArrayList<>();
-        if (!listEntity.isEmpty()) {
-            listEntity.forEach(e -> {
-                listDTO.add(new PetDTO(e));
-            });
-        }
-        return listDTO;
+    public List<PetEntity> findByOwnerId(Long ownerId) {
+        return petRepository.findByOwner(ownerId);
     }
 }

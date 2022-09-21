@@ -6,13 +6,13 @@ import java.util.List;
 
 public interface IScheduleService {
 
-    ScheduleDTO add(ScheduleDTO schedule);
+    ScheduleEntity add(ScheduleDTO schedule);
 
-    List<ScheduleDTO> findAll();
+    List<ScheduleEntity> findAll();
 
-    List<ScheduleDTO> findByPet(Long petId);
+    List<ScheduleEntity> findByPet(Long petId);
 
-    List<ScheduleDTO> findByCustomer(Long petId);
+    List<ScheduleEntity> findByCustomer(Long petId);
 
-    List<ScheduleDTO> findByEmployee(Long employeeId);
+    List<ScheduleEntity> findByEmployee(Long employeeId);
 }
