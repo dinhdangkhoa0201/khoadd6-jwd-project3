@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(path = "/pets")
+@RequestMapping(path = "/pet")
 public class PetController {
 
     @Autowired

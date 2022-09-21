@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(path = "/schedules")
+@RequestMapping(path = "/schedule")
 public class ScheduleController {
 
     @Autowired
@@ -30,13 +30,13 @@ public class ScheduleController {
         return iScheduleService.add(dto).builder();
     }
 
-    @GetMapping(path = "/pets/{petId}")
+    @GetMapping(path = "/pet/{petId}")
     public List<ScheduleDTO> findScheduleForPet(@PathVariable Long petId) {
         return iScheduleService.findByPet(petId).stream().map(ScheduleEntity::builder).collect(
                 Collectors.toList());
     }
 
-    @GetMapping(path = "/employees/{employeeId}")
+    @GetMapping(path = "/employee/{employeeId}")
     public List<ScheduleDTO> findScheduleForEmployee(@PathVariable Long employeeId) {
         return iScheduleService.findByEmployee(employeeId).stream().map(ScheduleEntity::builder).collect(
                 Collectors.toList());

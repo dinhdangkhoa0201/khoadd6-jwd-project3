@@ -14,23 +14,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(path = "/customer")
+@RequestMapping(path = "/user")
 public class CustomerController {
 
     @Autowired
     private ICustomerService iCustomerService;
 
-    @PostMapping("")
+    @PostMapping("/customer")
     public CustomerDTO save(@RequestBody CustomerDTO dto) {
         return iCustomerService.add(dto).builder();
     }
 
-    @GetMapping
+    @GetMapping("/customer")
     public List<CustomerDTO> findAll() {
         return iCustomerService.findAll().stream().map(CustomerEntity::builder).collect(Collectors.toList());
     }
 
-    @GetMapping(path = "/pets/{petId}")
+    @GetMapping(path = "/customer/pet/{petId}")
     public CustomerDTO findOwnerByPet(@PathVariable("petId") Long petId) {
         return iCustomerService.findByPetId(petId).builder();
     }

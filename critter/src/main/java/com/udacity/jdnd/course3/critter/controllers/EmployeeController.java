@@ -18,23 +18,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(path = "/employees")
+@RequestMapping(path = "/user")
 public class EmployeeController {
 
     @Autowired
     private IEmployeeService iEmployeeService;
 
-    @PostMapping
+    @PostMapping("/employee")
     public EmployeeDTO save(@RequestBody EmployeeDTO dto) {
         return iEmployeeService.add(dto).builder();
     }
 
-    @PostMapping("/{employeeId}")
+    @PostMapping("/employee/{employeeId}")
     public EmployeeDTO findById(@PathVariable("employeeId") Long employeeId) {
         return iEmployeeService.findById(employeeId).builder();
     }
 
-    @PutMapping("/{employeeId}")
+    @PutMapping("/employee/{employeeId}")
     public void setAvailability(@RequestBody Set<DayOfWeek> daysAvailable,
             @PathVariable("employeeId") Long employeeId) {
         EmployeeDTO employeeDTO = iEmployeeService.findById(employeeId).builder();
@@ -42,7 +42,7 @@ public class EmployeeController {
         iEmployeeService.add(employeeDTO);
     }
 
-    @GetMapping("/availability")
+    @GetMapping("/employee/availability")
     public List<EmployeeDTO> findEmployeesForSkill(@RequestBody EmployeeRequestDTO request) {
         return iEmployeeService.findByAvailability(request.getSkills(), request.getDate()).stream().map(
                 EmployeeEntity::builder).collect(Collectors.toList());
